@@ -19,6 +19,7 @@
 import logging
 import math
 import os
+import pdb
 
 import torch
 from torch import nn
@@ -1111,7 +1112,9 @@ class BertForSequenceClassification(BertPreTrainedModel):
 
         self.bert = BertModel(config)
         self.dropout = nn.Dropout(config.hidden_dropout_prob)
-        self.classifier = nn.Linear(config.hidden_size, self.config.num_labels)
+        self.classifier = nn.Linear(
+            config.hidden_size + config.time_size + config.followers_size, 
+            self.config.num_labels)
 
         self.init_weights()
 
@@ -1125,6 +1128,12 @@ class BertForSequenceClassification(BertPreTrainedModel):
         head_mask=None,
         inputs_embeds=None,
         labels=None,
+        # MAGGIE'S CHANGES
+        # ========================================
+        time=None,
+        followers=None,
+        # ========================================
+        # END
     ):
         r"""
         labels (:obj:`torch.LongTensor` of shape :obj:`(batch_size,)`, `optional`, defaults to :obj:`None`):
@@ -1179,6 +1188,21 @@ class BertForSequenceClassification(BertPreTrainedModel):
         pooled_output = outputs[1]
 
         pooled_output = self.dropout(pooled_output)
+
+        pdb.set_trace()
+        # MAGGIE'S CHANGES START HERE
+        # ========================================================================
+        if followers is not None:
+            pooled_output = torch.cat(
+                (pooled_output, followers.reshape(followers.size()[0], 1)), 1)
+        if time is not None:
+            pooled_output = torch.cat(
+                (pooled_output, time.reshape(time.size()[0], 1)), 1)
+        # ========================================================================
+        # END
+
+        pdb.set_trace()
+
         logits = self.classifier(pooled_output)
 
         outputs = (logits,) + outputs[2:]  # add hidden states and attention if they are here
