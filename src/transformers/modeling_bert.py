@@ -1189,7 +1189,7 @@ class BertForSequenceClassification(BertPreTrainedModel):
 
         pooled_output = self.dropout(pooled_output)
 
-        pdb.set_trace()
+        # pdb.set_trace()
         # MAGGIE'S CHANGES START HERE
         # ========================================================================
         if followers is not None:
@@ -1201,7 +1201,7 @@ class BertForSequenceClassification(BertPreTrainedModel):
         # ========================================================================
         # END
 
-        pdb.set_trace()
+        # pdb.set_trace()
 
         logits = self.classifier(pooled_output)
 
